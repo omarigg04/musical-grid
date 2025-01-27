@@ -1,17 +1,18 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <MusicGrid />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import MusicGrid from './components/MusicGrid.vue';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
-}
+    MusicGrid,
+  },
+};
 </script>
 
 <style>
