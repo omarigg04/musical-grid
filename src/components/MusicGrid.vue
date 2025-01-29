@@ -153,6 +153,9 @@ export default {
       this.selectedScale = newScale; // Aquí actualizamos el valor de selectedScale
       this.updateGrid();
     },
+
+
+    
     updateSequencerSpeed() {
       if (this.isSequencerActive) {
         this.stopSequencer();
