@@ -1,9 +1,11 @@
 <template>
   <div class="music-grid">
     <h1>Music Sequencer</h1>
-    <select v-model="selectedScale" @change="updateGrid" class="scale-selector">
-      <option v-for="scale in scales" :key="scale" :value="scale">{{ scale }}</option>
-    </select>
+    <ScaleSelector
+      :selectedScale="selectedScale"
+      :scales="scales"
+      @update:selectedScale="updateSelectedScale"
+    />
 
     <!-- Control de velocidad -->
     <div class="controls">
@@ -45,23 +47,36 @@
 
   
 <script>
+import ScaleSelector from './ScaleSelector.vue'; // Asegúrate de que la ruta sea correcta
+import { SCALES } from '../constants/scales.js';
+import { NOTES } from '../constants/notes.js';
 export default {
+
+  components: {
+    ScaleSelector,
+  },
   data() {
     return {
       selectedScale: 'C Major',
-      scales: ['C Major', 'G Major', 'D Major'],
+      scales: SCALES,
+      notes: NOTES,
       grid: [],
-      notes: {
-        'C Major': ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'],
-        'G Major': ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5'],
-        'D Major': ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'],
-      },
       audioBuffers: {}, // Almacenará los sonidos precargados
       isSequencerActive: false, // Estado del secuenciador
       sequencerInterval: null, // Intervalo del secuenciador
       currentSequencerIndex: 0, // Índice de la nota actual en la secuencia
       sequencerSpeed: 500, // Velocidad inicial del secuenciador (en ms)
-      availableNotes: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5'], // Notas disponibles
+      // C0 -> A7
+      availableNotes: [
+        'C0', 'Db0', 'D0', 'Eb0', 'E0', 'F0', 'Gb0', 'G0', 'Ab0', 'A0', 'Bb0', 'B0',
+        'C1', 'Db1', 'D1', 'Eb1', 'E1', 'F1', 'Gb1', 'G1', 'Ab1', 'A1', 'Bb1', 'B1',
+        'C2', 'Db2', 'D2', 'Eb2', 'E2', 'F2', 'Gb2', 'G2', 'Ab2', 'A2', 'Bb2', 'B2',
+        'C3', 'Db3', 'D3', 'Eb3', 'E3', 'F3', 'Gb3', 'G3', 'Ab3', 'A3', 'Bb3', 'B3',
+        'C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4',
+        'C5', 'Db5', 'D5', 'Eb5', 'E5', 'F5', 'Gb5', 'G5', 'Ab5', 'A5', 'Bb5', 'B5',
+        'C6', 'Db6', 'D6', 'Eb6', 'E6', 'F6', 'Gb6', 'G6', 'Ab6', 'A6', 'Bb6', 'B6',
+        'C7', 'Db7', 'D7', 'Eb7', 'E7', 'F7', 'Gb7', 'G7', 'Ab7', 'A7', 'Bb7', 'B7', 
+      ], // Notas disponibles
     };
   },
   mounted() {
@@ -79,7 +94,7 @@ export default {
     async preloadSounds(scale) {
       this.audioBuffers = {};
       for (const note of this.notes[scale]) {
-        const audio = new Audio(`https://github.com/gleitz/midi-js-soundfonts/blob/gh-pages/FatBoy/acoustic_guitar_nylon-mp3/${note}.mp3?raw=true`);
+        const audio = new Audio(`https://github.com/gleitz/midi-js-soundfonts/blob/gh-pages/FatBoy/flute-mp3/${note}.mp3?raw=true`);
         await new Promise((resolve) => {
           audio.addEventListener('canplaythrough', resolve, { once: true });
           audio.load();
@@ -132,6 +147,11 @@ export default {
         clearInterval(this.sequencerInterval); // Detiene el intervalo
         this.sequencerInterval = null;
       }
+    },
+    updateSelectedScale(newScale) {
+      console.log('Nuevo selectedScale recibido:', newScale);
+      this.selectedScale = newScale; // Aquí actualizamos el valor de selectedScale
+      this.updateGrid();
     },
     updateSequencerSpeed() {
       if (this.isSequencerActive) {
