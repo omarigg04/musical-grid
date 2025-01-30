@@ -2,7 +2,7 @@
   <h1>Music Sequencer</h1>
   <div class="music-grid">
 
-    <div class="piano">
+    <!-- <div class="piano">
       <div id="C" class="key white"></div>
       <div id="Db" class="key black"></div>
       <div id="D" class="key white"></div>
@@ -16,10 +16,15 @@
       <div id="Bb" class="key black"></div>
       <div id="B" class="key white"></div>
       <div id="C" class="key white"></div>
+    </div> -->
+
+    <!-- PIANO -->
+    <div class="piano">
+      <div v-for="note in pianoKeys" :key="note"
+           :id="note"
+           :class="['key', { black: isBlackKey(note), white: !isBlackKey(note), highlighted: isNoteInScale(note) }]">
+      </div>
     </div>
-
-
-
 
     <!-- Grid de celdas -->
     <div class="grid">
@@ -83,7 +88,7 @@ export default {
       // sounds: {},      // Los sonidos cargados
 
 
-
+      pianoKeys: ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B', 'C'], // Notas del piano
       decayValue: 1,   // Valor por defecto del decay
       selectedScale: 'C Major',
       selectedInstrument: 'fiddle-mp3',
@@ -113,6 +118,7 @@ export default {
     this.updateGrid();
   },
   methods: {
+
     async updateGrid() {
       this.grid = this.notes[this.selectedScale].map(note => ({
         note,
@@ -121,6 +127,18 @@ export default {
       }));
       await this.preloadSounds(this.selectedScale, this.selectedInstrument);
     },
+
+
+    async updatePiano() {
+      this.grid = this.notes[this.selectedScale].map(note => ({
+        note,
+        active: false,
+        color: '#fff',
+      }));
+      await this.preloadSounds(this.selectedScale, this.selectedInstrument);
+    },
+
+
     async preloadSounds(scale) {
       this.sounds = {};
       for (const note of this.notes[scale]) {
@@ -213,7 +231,19 @@ export default {
     updateDecay() {
       // Este método se puede usar si quieres aplicar el decay en tiempo real al sonido activo
       console.log(`Nuevo valor de decay: ${this.decayValue}`);
-    }
+    },
+    //Verifica si la nota está en la escala actual para pintarla de rojo.
+    isNoteInScale(note) {
+  const scaleNotes = this.notes[this.selectedScale].map(n => n.slice(0, -1));
+  const inScale = scaleNotes.includes(note);
+  console.log(`Note: ${note}, In Scale: ${inScale}`);
+  return inScale;
+},
+    //Asigna las teclas negras
+    isBlackKey(note) {
+      return ['Db', 'Eb', 'Gb', 'Ab', 'Bb'].includes(note);
+    },
+
   },
   beforeUnmount() {
     this.stopSequencer(); // Asegúrate de detener el secuenciador al desmontar el componente
@@ -357,5 +387,9 @@ h1 {
 
 .key.black:nth-of-type(11) {
   left: 255px;
+}
+
+.highlighted {
+  background-color: red !important;
 }
 </style>
