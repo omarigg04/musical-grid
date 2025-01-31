@@ -390,6 +390,6 @@ h1 {
 }
 
 .highlighted {
-  background-color: red !important;
+  background-color: rgb(190, 104, 104) !important;
 }
 </style>
