@@ -75,7 +75,10 @@ export default {
       sequencerInterval: null,
       currentSequencerIndex: 0,
       sequencerSpeed: 500,
-      availableNotes: ['C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4'],
+      availableNotes: ['C3', 'Db3', 'D3', 'Eb3', 'E3', 'F3', 'Gb3', 'G3', 'Ab3', 'A3', 'Bb3', 'B3',
+                      'C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4',
+                      'C5', 'Db5', 'D5', 'Eb5', 'E5', 'F5', 'Gb5', 'G5', 'Ab5', 'A5', 'Bb5', 'B5'],
+      
       synth: null,  // Cambiamos sampler por synth
       synthSettings: {
         oscillator: {
@@ -92,13 +95,13 @@ export default {
   },
   mounted() {
     this.updateGrid();
-    // this.initializeSynth();
-    Tone.start().then(() => {
-      console.log('Tone.js ha sido inicializado');
-      this.synth = new Tone.Synth().toDestination();
-    }).catch((error) => {
-      console.error('Error al inicializar Tone.js:', error);
-    });
+    this.initializeSynth();
+    // Tone.start().then(() => {
+    //   console.log('Tone.js ha sido inicializado');
+    //   this.synth = new Tone.Synth().toDestination();
+    // }).catch((error) => {
+    //   console.error('Error al inicializar Tone.js:', error);
+    // });
 
   },
   methods: {
@@ -107,6 +110,15 @@ export default {
 
     initializeSynth() {
       if (this.synth) this.synth.dispose(); // Limpiar instancia previa
+      this.synth = new Tone.Synth({
+    oscillator: { type: 'sine' },
+    envelope: {
+      attack: 0.1,
+      decay: this.decayValue,  // Se usa el valor de decay aquí
+      sustain: 0.3,
+      release: 0.9
+    }
+  }).toDestination();
       this.synth = new Tone.Synth(this.synthSettings).toDestination();
       this.part = new Tone.Part((time, value) => {
         this.synth.triggerAttackRelease(value.note, "8n", time);
@@ -137,7 +149,7 @@ export default {
     playSound(note) {
       //create a synth and connect it to the main output (your speakers)
       const synth = new Tone.Synth().toDestination();
-
+      this.synth.envelope.decay = this.decayValue;
       //play a middle 'C' for the duration of an 8th note
       synth.triggerAttackRelease(note, "8n");
 
@@ -241,6 +253,8 @@ export default {
       // Actualizamos el decay del envelope del synth
       if (this.synth) {
         this.synth.envelope.decay = this.decayValue;
+        console.log('Decay actualizado:', this.decayValue);
+        
       }
     },
 
